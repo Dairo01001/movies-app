@@ -1,31 +1,38 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getMovies } from "../services/movies";
+import debounce from "just-debounce-it";
 
 export const ALL = "all";
 
-export function useMovies({ typeFilter }) {
+export function useMovies({ typeFilter, search }) {
   const [movies, setMovies] = useState([]);
   const [types, setTypes] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(null);
+  const searchRef = useRef(search);
 
-  useEffect(() => {
-    async function callApi() {
+  const debouncedGetMovies = useCallback(
+    debounce(async (search) => {
       try {
         setLoading(true);
-        const moviesRes = await getMovies();
+        setError(null);
+        const moviesRes = await getMovies({ search });
         setMovies(moviesRes);
         const typesRes = new Set(moviesRes.map(({ type }) => type));
         setTypes([ALL, ...typesRes]);
       } catch (error) {
-        setError("Movies not found");
+        setError(error.message);
       } finally {
         setLoading(false);
       }
-    }
-    callApi();
-  }, []);
+    }, 250),
+    []
+  );
 
+  useEffect(() => {
+    if (searchRef.current === search) return;
+    debouncedGetMovies(search);
+  }, [search, debouncedGetMovies]);
 
   const moviesFilter = useMemo(
     () =>
@@ -35,5 +42,5 @@ export function useMovies({ typeFilter }) {
     [typeFilter, movies]
   );
 
-  return { types: types, movies: moviesFilter, loading, error };
+  return { types, movies: moviesFilter, loading, error };
 }

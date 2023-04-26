@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 
 export default function Card({ movie }) {
   const { image, title, id, year } = movie;
-  
+
   return (
     <div
       key={id}

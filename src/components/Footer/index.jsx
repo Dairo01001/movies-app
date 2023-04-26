@@ -14,7 +14,7 @@ export default function Footer() {
         <span className="text-sm text-gray-500 sm:text-center dark:text-gray-400">
           © 2023{" "}
           <a
-            href="https://github.com/Dairo01001"
+            href="https://github.com/Dairo01001/movies-app"
             target="_blank"
             className="hover:underline"
             rel="noreferrer"

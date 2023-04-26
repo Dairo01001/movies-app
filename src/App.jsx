@@ -8,17 +8,20 @@ import Loading from "./components/Loading";
 
 function App() {
   const [typeFilter, setTypeFilter] = useState("all");
-  const { movies, types, loading } = useMovies({ typeFilter });
+  const [search, setSearch] = useState("avengers");
+  const { movies, types, loading } = useMovies({ typeFilter, search });
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const { search } = Object.fromEntries(new window.FormData(e.target));
-    console.log(search);
+    setSearch(search);
   };
 
-  return loading ? (
-    <Loading />
-  ) : (
+  const handleChange = (e) => {
+    setSearch(e.target.value);
+  };
+
+  return (
     <div className="flex flex-col min-h-screen bg-white dark:bg-gray-900">
       <header className="w-full flex flex-col items-center ">
         <h1 className="p-5 font-extrabold text-4xl text-gray-900 lg:text-6xl md:text-5xl tracking-tight dark:text-white">
@@ -45,6 +48,8 @@ function App() {
               </svg>
             </div>
             <input
+              onChange={handleChange}
+              value={search}
               type="text"
               autoComplete="off"
               minLength="3"
@@ -91,7 +96,7 @@ function App() {
         ))}
       </div>
       <main className="flex justify-center p-5">
-        <MoviesCards movies={movies} />
+        {loading ? <Loading /> : <MoviesCards movies={movies} />}
       </main>
       <Footer />
     </div>
